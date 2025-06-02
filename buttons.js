@@ -1,4 +1,5 @@
-  function setupBtn1(element) {
+// Buttons  
+function setupBtn1(element) {
     const config = {
       duration: 0.3,
       ease: "power1.in",
@@ -85,4 +86,29 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('[data-gsap="btn.1"]').forEach(setupBtn1);
+  });
+
+
+
+// Underline Links
+  document.querySelectorAll('[data-hover="underline"]').forEach(link => {
+    const underline = link.querySelector('.underline');
+
+    link.addEventListener('mouseenter', () => {
+      gsap.set(underline, { transformOrigin: 'left' });
+      gsap.to(underline, {
+        scaleX: 1,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
+    });
+
+    link.addEventListener('mouseleave', () => {
+      gsap.set(underline, { transformOrigin: 'right' });
+      gsap.to(underline, {
+        scaleX: 0,
+        duration: 0.4,
+        ease: 'power2.in'
+      });
+    });
   });
