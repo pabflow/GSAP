@@ -1,54 +1,85 @@
-const wraps = document.querySelectorAll(".reveal-on-scroll");
+document.querySelectorAll("[data-reveal-wrapper]").forEach((wrap) => {
+  const img = wrap.querySelector("[data-reveal-image]");
+  if (!img) return;
 
-// Ocultar la imagen al cargar (desde abajo)
-wraps.forEach((wrap) => {
-  const img = wrap.querySelector(".reveal-image");
-  if (img) {
-    img.style.clipPath = "inset(0% 0% 100% 0%)"; // Oculto desde abajo
-    img.style.transform = "scale(1.22)";
-    img.style.transition = "none";
+  const direction = wrap.getAttribute("data-reveal") || "bottom";
+  const useScale = wrap.getAttribute("data-scale") !== "false"; // true por default
+
+  // Estados iniciales según dirección
+  let clipStart = "";
+  let transformStart = "";
+
+  switch (direction) {
+    case "top":
+      clipStart = "inset(100% 0% 0% 0%)";
+      transformStart = "translateY(-20%)";
+      break;
+    case "left":
+      clipStart = "inset(0% 100% 0% 0%)";
+      transformStart = "translateX(-20%)";
+      break;
+    case "right":
+      clipStart = "inset(0% 0% 0% 100%)";
+      transformStart = "translateX(20%)";
+      break;
+    case "bottom":
+    default:
+      clipStart = "inset(0% 0% 100% 0%)";
+      transformStart = "translateY(20%)";
+      break;
   }
+
+  img.style.clipPath = clipStart;
+  img.style.transition = "none";
+  img.style.willChange = "clip-path, transform";
+  img.style.transform = useScale
+    ? `${transformStart} scale(1.22)`
+    : transformStart;
 });
 
+// Observador
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      const img = entry.target.querySelector(".reveal-image");
+      const wrap = entry.target;
+      const img = wrap.querySelector("[data-reveal-image]");
       if (!img) return;
 
+      const direction = wrap.getAttribute("data-reveal") || "bottom";
+      const useScale = wrap.getAttribute("data-scale") !== "false";
+
       if (entry.isIntersecting) {
-        // Transición solo para revelar una vez
         requestAnimationFrame(() => {
           img.style.transition =
-            "clip-path 0.9s ease-out, transform 0.5s ease-out";
-
-          img.style.clipPath = "inset(0% 0% 0% 0%)"; // Revelar de abajo hacia arriba
+            "clip-path 0.9s ease-out, transform 0.6s ease-out";
+          img.style.clipPath = "inset(0% 0% 0% 0%)";
+          img.style.transform = useScale ? "scale(1)" : "translate(0, 0)";
         });
 
-        // Parallax scroll handler
-        const updateTransform = () => {
-          const rect = entry.target.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
-          const percentScrolled = (rect.top / windowHeight) * 100;
-          const translateY = Math.min(percentScrolled * 0.3, 20);
-          const fixedScale = 1.22;
+        // Scroll parallax si tiene zoom
+        if (useScale) {
+          const updateTransform = () => {
+            const rect = wrap.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const percentScrolled = (rect.top / windowHeight) * 100;
+            const translateY = Math.min(percentScrolled * 0.3, 20);
 
-          img.style.transform = `translate3d(0, -${translateY}%, 0) scale(${fixedScale})`;
-        };
+            img.style.transform = `translate3d(0, -${translateY}%, 0) scale(1.22)`;
+          };
 
-        window.addEventListener("scroll", updateTransform);
-        updateTransform();
+          window.addEventListener("scroll", updateTransform);
+          updateTransform();
 
-        entry.target._removeScrollListener = () => {
-          window.removeEventListener("scroll", updateTransform);
-        };
+          wrap._removeScrollListener = () => {
+            window.removeEventListener("scroll", updateTransform);
+          };
+        }
 
-        // Ya no necesitamos observar este elemento después
-        observer.unobserve(entry.target);
+        observer.unobserve(wrap);
       } else {
-        if (entry.target._removeScrollListener) {
-          entry.target._removeScrollListener();
-          delete entry.target._removeScrollListener;
+        if (wrap._removeScrollListener) {
+          wrap._removeScrollListener();
+          delete wrap._removeScrollListener;
         }
       }
     });
@@ -60,4 +91,7 @@ const observer = new IntersectionObserver(
   }
 );
 
-wraps.forEach((wrap) => observer.observe(wrap));
+// Aplicar el observador a cada wrapper
+document
+  .querySelectorAll("[data-reveal-wrapper]")
+  .forEach((wrap) => observer.observe(wrap));
