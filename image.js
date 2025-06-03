@@ -33,7 +33,7 @@ const observer = new IntersectionObserver(
           const translateY = Math.min(percentScrolled * 0.3, 20);
           const fixedScale = 1.22;
 
-          img.style.transform = translate3d(0, -${translateY}%, 0) scale(${fixedScale});
+          img.style.transform = `translate3d(0, -${translateY}%, 0) scale(${fixedScale})`;
         };
 
         window.addEventListener("scroll", updateTransform);
