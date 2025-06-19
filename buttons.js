@@ -1,5 +1,26 @@
-// Buttons  
-function setupBtn1(element) {
+/**
+ * Pablo Gubelin Webflow Component Script
+ * --------------------------------
+ * This file initializes custom scripts for Webflow.
+ * It runs safely after Webflow and the DOM have fully loaded.
+ *
+ * ✅ Fully compatible with:
+ *   - Dynamic Webflow CMS content
+ *   - Symbols
+ *   - Webflow Interactions (IX2)
+ *   - Multiple custom scripts running in parallel
+ *
+ * ℹ️ Use classes, data attributes, or IDs specific to each component.
+ */
+
+Webflow ||= [];
+Webflow.push(function () {
+  console.log("[Webflow Custom Script] Successfully initialized 🚀");
+
+  /** --------------------------------
+   * 🎯 COMPONENT 1: GSAP Hover Button
+   * -------------------------------- */
+  function setupBtn1(element) {
     const config = {
       duration: 0.3,
       ease: "power1.in",
@@ -28,7 +49,6 @@ function setupBtn1(element) {
       zIndex: 0
     });
     element.appendChild(overlay);
-
     element.style.zIndex = 1;
 
     function percent(pos, size) {
@@ -84,15 +104,14 @@ function setupBtn1(element) {
     element.addEventListener("mouseleave", onLeave);
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[data-gsap="btn.1"]').forEach(setupBtn1);
-  });
+  document.querySelectorAll('[data-gsap="btn.1"]').forEach(setupBtn1);
 
-
-
-// Underline Links
+  /** --------------------------------
+   * 🧠 COMPONENT 2: Animated Underline on Links
+   * -------------------------------- */
   document.querySelectorAll('[data-hover="underline"]').forEach(link => {
     const underline = link.querySelector('.underline');
+    if (!underline) return;
 
     link.addEventListener('mouseenter', () => {
       gsap.set(underline, { transformOrigin: 'left' });
@@ -112,3 +131,9 @@ function setupBtn1(element) {
       });
     });
   });
+
+  /** --------------------------------
+   * ✅ Debug / Test Logs
+   * -------------------------------- */
+  console.log("[Webflow Custom Script] All components successfully initialized ✅");
+});
